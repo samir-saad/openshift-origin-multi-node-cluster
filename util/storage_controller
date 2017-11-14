@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+  class VagrantPlugins::ProviderVirtualBox::Action::SetName
+    alias_method :original_call, :call
+    def call(env)
+      machine = env[:machine]
+      driver = machine.provider.driver
+      uuid = driver.instance_eval { @uuid }
+      ui = env[:ui]
+
+      controller_name = 'SATA Controller'
+
+      vm_info = driver.execute("showvminfo", uuid)
+      has_this_controller = vm_info.match("Storage Controller Name.*#{controller_name}")
+
+      if has_this_controller
+        ui.info "already has the #{controller_name} hdd controller"
+      else
+        ui.info "creating #{controller_name} controller #{controller_name}"
+        driver.execute('storagectl', uuid,
+          '--name', "#{controller_name}",
+          '--add', 'sata',
+          '--controller', 'IntelAhci')
+      end
+
+      original_call(env)
+    end
+  end

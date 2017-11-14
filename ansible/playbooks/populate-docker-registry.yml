@@ -1,0 +1,45 @@
+---
+
+- name: Populate Local Docker Registry
+  hosts: infra:worker_nodes
+  become: yes
+  
+  tasks:        
+    - name: Pull Docker Images for All Nodes
+      command: docker pull {{ item }}
+      with_items:
+        - "openshift/origin-deployer:v3.6.0"
+        - "openshift/origin-pod:v3.6.0"
+        
+    - name: Pull Docker Images for Infra Nodes
+      when: inventory_hostname in groups.infra
+      command: docker pull {{ item }}
+      with_items:
+        - "openshift/origin-haproxy-router:v3.6.0"
+        - "openshift/origin-docker-registry:v3.6.0"
+        
+    - name: Pull Docker Images for Worker Nodes
+      when: inventory_hostname in groups.worker_nodes
+      command: docker pull {{ item }}
+      with_items:
+        - "openshift/origin-keepalived-ipfailover:v3.6.0"
+        - "openshift/origin-sti-builder:v3.6.0"
+    
+    - name: Check Logical Volumes
+      command: lvs
+      register: lvs_out
+    - debug:
+        var: lvs_out.stdout_lines
+      
+    - name: Check Docker Info
+      command: docker info
+      register: info_out
+    - debug:
+        var: info_out.stdout_lines
+        
+    - name: List Docker Images
+      command: docker images
+      register: images_out
+    - debug:
+        var: images_out.stdout_lines
+      

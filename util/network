@@ -1,0 +1,30 @@
+# Set options for the network interface configuration. All values are
+# optional, and can include:
+# - ip (default = DHCP)
+# - netmask (default value = 255.255.255.0
+# - mac
+# - auto_config (if false, Vagrant will not configure this network interface
+# - intnet (if true, an internal network adapter will be created instead of a
+#   host-only adapter)
+def network_options(host)
+  options = {}
+
+  if host.has_key?('ip')
+    options[:ip] = host['ip']
+    options[:netmask] = host['netmask'] ||= '255.255.255.0'
+  else
+    options[:type] = 'dhcp'
+  end
+
+  if host.has_key?('mac')
+    options[:mac] = host['mac'].gsub(/[-:]/, '')
+  end
+  if host.has_key?('auto_config')
+    options[:auto_config] = host['auto_config']
+  end
+  if host.has_key?('intnet') && host['intnet']
+    options[:virtualbox__intnet] = true
+  end
+
+  options
+end

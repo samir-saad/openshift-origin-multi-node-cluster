@@ -1,0 +1,62 @@
+---
+  # Ansible and Ansible Tower, Bind DNS, and NFS Storage
+  - name: toolbox
+    ip:   192.168.1.100
+    memory: 2048
+    
+    provisions:
+      - type: file
+        src: dns
+        dest: /vagrant/dns
+      
+      - type: shell
+        script: shell/setup_dns.sh
+        args:
+        
+      - type: file
+        src: ansible
+        dest: /vagrant/ansible
+        
+      - type: shell
+        script: shell/setup_ansible.sh
+        args:
+
+  # Cluster Master
+  - name: master
+    ip:   192.168.1.101
+    memory: 3072
+    
+    disks:
+      - location: disks/master-docker
+        size: 15
+        #controller: SATA Controller
+        #format: vmdk
+        #fixed: yes
+        
+   # Docker Register, and HA Proxy
+  - name: infra
+    ip:   192.168.1.110
+    memory: 3072
+    
+    disks:
+      - location: disks/infra-docker        
+        size: 20      
+
+   # Worker node1
+  - name: node1
+    ip:   192.168.1.111
+    memory: 3072
+    
+    disks:
+      - location: disks/node1-docker
+        size: 20
+
+   # Worker node2
+  - name: node2
+    ip:   192.168.1.112
+    memory: 3072
+    
+    disks:
+      - location: disks/node2-docker
+        size: 20
+        

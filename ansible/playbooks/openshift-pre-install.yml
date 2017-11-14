@@ -1,0 +1,24 @@
+---
+
+- name: Openshift Pre Installation
+  hosts: cluster
+  become: yes
+  
+  tasks:        
+    - name: Install OpenShift Repositories on All Nodes
+      yum:
+        name: centos-release-openshift-origin
+        state: latest
+    
+    - name: List Repositories
+      command: yum repolist
+      register: yum_out
+    - debug:
+        var: yum_out.stdout_lines
+    
+    - name: Install OpenShift Utils on Ansible Machine
+      when: inventory_hostname in groups.ansible
+      yum:
+        name: atomic-openshift-utils
+        state: latest
+        

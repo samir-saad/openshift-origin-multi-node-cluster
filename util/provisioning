@@ -1,0 +1,94 @@
+
+def info(msg)
+  if !$provisioned
+    print msg
+  end
+end
+
+def sync_folders(vm, folders)
+  if !folders.nil? && !folders.empty?
+    folders.each do |folder|
+	  info("Syncked folder: #{folder}\n")
+      vm.synced_folder folder['src'], folder['dest'], folder['options']
+    end
+  end
+end
+
+def create_disks(vb, disks)
+  if !disks.nil? && !disks.empty?
+    disks.each do |disk|
+      unless File.exist?(disk['location'])
+		 disk['format'] ||= 'VDI'
+		 if !disk['location'].end_with? ".#{disk['format']}".downcase
+		   disk['location'] = [disk['location'], disk['format'].downcase].join('.')
+		 end
+	     info("Creating disk: #{disk} ")
+		 if disk['fixed']
+		   info("Fixed allocation\n")
+		   vb.customize ['createhd', '--filename', disk['location'], '--format', disk['format'], '--variant', 'Fixed', '--size', disk['size'] * 1024]
+		 else
+		   info("Dynamic allocation\n")
+           vb.customize ['createhd', '--filename', disk['location'], '--format', disk['format'], '--size', disk['size'] * 1024]
+		 end
+      end
+	  ## 'SATA Controller', 'IDE Controller'
+	  controller = disk['controller'] ||= 'IDE'
+      vb.customize ['storageattach', :id,  '--storagectl', controller, '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk['location']]
+    end
+  end
+end
+
+def run_provisions(cfg, provisions, hostname, ip)
+  if !provisions.nil? && !provisions.empty?
+    provisions.each do |provision|
+	  info("Running provision: #{provision}\n")
+      case provision['type']
+      when 'file'
+        run_file(cfg, provision)
+        
+      when 'shell'
+        run_shell(cfg, provision)
+        
+      when 'ansible'
+        run_ansible_playbook(cfg, provision, hostname, ip)
+        
+      else
+        info('Unsupported provisioner.\n')
+        
+      end
+    end
+  end
+end
+
+def run_file(cfg, provision)
+  cfg.vm.provision :file do |file|
+    file.source = provision['src']
+    file.destination = provision['dest']
+  end
+end
+
+def run_shell(cfg, provision)
+  cfg.vm.provision :shell do |shell|
+    shell.path = provision['script']
+    shell.args = provision['args']
+  end
+end
+
+def run_ansible_playbook(cfg, provision, hostname, ip)
+  cfg.vm.provision :ansible do |ansible|
+    ansible.playbook = provision['playbook']
+    ## Disable default limit to connect to all the machines
+    ## ansible.limit = "all"
+    ## ansible.inventory_path = ./inventory
+    ## Enable debugging
+    ansible.verbose = true
+    ansible.verbose = "vvvvv"
+    
+    ansible.host_vars = {
+       hostname => {
+         "ansible_host" => ip
+       }
+    }
+    ansible.raw_arguments = provision['args']
+  end
+end

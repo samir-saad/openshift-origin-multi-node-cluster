@@ -1,0 +1,36 @@
+---
+   box: "centos/7"
+   domain: "local.net"
+   memory.default: 1024
+   cpus.default: 1
+
+#   synced_folders:
+#      - src: keys
+#        dest: /keys
+#        options:
+#          :create: true
+
+   provisions:
+     - type: file
+       src: keys
+       dest: /vagrant/keys
+     - type: file
+       src: shell
+       dest: /vagrant/shell
+       
+#     - type: ansible
+#       playbook: playbook/basic_conf.yaml
+#       args:
+#       
+     - type: shell
+       script: shell/install-packages.sh
+       args: --packages "wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct NetworkManager"
+       
+     - type: shell
+       script: shell/network_conf.sh
+       args: --dns "192.168.1.100"
+       
+     - type: shell
+       script: shell/sshd_conf.sh
+       args:
+   

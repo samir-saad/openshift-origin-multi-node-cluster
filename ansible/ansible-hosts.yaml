@@ -1,0 +1,98 @@
+[OSEv3:children]
+masters
+nodes
+nfs
+
+[OSEv3:vars]
+ansible_ssh_user=root
+debug_level=2
+openshift_deployment_type=origin
+openshift_release=v3.6
+openshift_image_tag=v3.6.0
+openshift_pkg_version=-3.6.0
+
+# Skip memory and disk check
+openshift_disable_check=disk_availability,memory_availability
+
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname=master.local.net
+openshift_master_cluster_public_hostname=master.local.net
+
+#os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+
+openshift_master_default_subdomain=cloudapps.local.net
+
+#openshift_use_dnsmasq=False
+#openshift_node_dnsmasq_additional_config_file=/home/bob/ose-dnsmasq.conf
+
+# Configure Security
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# default project node selector
+osm_default_node_selector='region=primary'
+
+# Configure Router
+openshift_hosted_router_selector='region=infra'
+openshift_hosted_router_replicas=1
+#openshift_hosted_router_certificate={\"certfile\": \"/path/to/router.crt\", \"keyfile\": \"/path/to/router.key\", \"cafile\": \"/path/to/router-ca.crt\"}
+
+# Configure Registry
+openshift_hosted_registry_selector='region=infra'
+openshift_hosted_registry_replicas=1
+
+openshift_hosted_registry_storage_kind=nfs
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
+openshift_hosted_registry_storage_host=toolbox.local.net
+openshift_hosted_registry_storage_nfs_directory=/exports
+openshift_hosted_registry_storage_volume_name=registry
+openshift_hosted_registry_storage_volume_size=5Gi
+
+# Configure Logging
+#openshift_hosted_logging_deploy=true
+#openshift_hosted_logging_elasticsearch_cluster_size=1
+#openshift_hosted_logging_storage_kind=nfs
+#openshift_hosted_logging_storage_access_modes=['ReadWriteOnce']
+#openshift_hosted_logging_storage_host=toolbox.local.net
+#openshift_hosted_logging_storage_nfs_directory=/exports
+#openshift_hosted_logging_storage_volume_name=logging
+#openshift_hosted_logging_storage_volume_size=10Gi
+#openshift_hosted_logging_storage_labels={'storage': 'logging'}
+
+# Configure Metrics
+#openshift_hosted_metrics_deploy=true
+#openshift_hosted_metrics_storage_kind=nfs
+#openshift_hosted_metrics_storage_access_modes=['ReadWriteOnce']
+#openshift_hosted_metrics_storage_host=toolbox.local.net
+#openshift_hosted_metrics_storage_nfs_directory=/exports
+#openshift_hosted_metrics_storage_volume_name=metrics
+#openshift_hosted_metrics_storage_volume_size=10Gi
+#openshift_hosted_metrics_storage_labels={'storage': 'metrics'}
+
+[toolbox]
+toolbox.local.net ansible_host=192.168.1.100 ansible_connection=local openshift_hostname=toolbox.local.net openshift_public_hostname=toolbox.local.net openshift_ip=192.168.1.100 openshift_public_ip=192.168.1.100
+
+[ansible:children]
+toolbox
+
+[nfs:children]
+toolbox
+
+[infra]
+infra.local.net ansible_host=192.168.1.110 openshift_hostname=infra.local.net openshift_public_hostname=infra.local.net openshift_ip=192.168.1.110 openshift_public_ip=192.168.1.110  openshift_node_labels="{'region': 'infra', 'zone': 'infranodes'}"
+
+[masters]
+master.local.net ansible_host=192.168.1.101 openshift_hostname=master.local.net openshift_public_hostname=master.local.net openshift_ip=192.168.1.101 openshift_public_ip=192.168.1.101  openshift_node_labels="{'region': 'infra'}"
+
+[worker_nodes]
+node1.local.net ansible_host=192.168.1.111 openshift_hostname=node1.local.net openshift_public_hostname=node1.local.net openshift_ip=192.168.1.111 openshift_public_ip=192.168.1.111  openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
+node2.local.net ansible_host=192.168.1.112 openshift_hostname=node2.local.net openshift_public_hostname=node2.local.net openshift_ip=192.168.1.112 openshift_public_ip=192.168.1.112  openshift_node_labels="{'region': 'primary', 'zone': 'west'}"
+
+[nodes:children]
+masters
+infra
+worker_nodes
+
+[cluster:children]
+ansible
+nfs
+nodes

@@ -1,0 +1,37 @@
+---
+
+- name: Openshift Post Installation
+  hosts: master.local.net
+  become: yes
+  
+  tasks: 
+    - name: Get Cluster Status
+      command: oc status
+      register: out
+    - debug:
+        var: out.stdout_lines
+        
+    - name: List Nodes
+      command: oc get nodes --show-labels
+      register: out
+    - debug:
+        var: out.stdout_lines
+    
+    - name: List Pods
+      command: oc get pods -o wide
+      register: out
+    - debug:
+        var: out.stdout_lines
+        
+    - name: Annotate namespace default to use selector region=infra
+      command: oc annotate namespace default openshift.io/node-selector='region=infra' --overwrite
+
+    - name: Add user admin
+      command: useradd admin
+
+    - name: Set admin password to admin
+      command: htpasswd -cb /etc/origin/master/htpasswd admin admin
+     
+    - name: Grant role admin to use admin on default namespace
+      command: oc policy add-role-to-user admin admin -n default
+        

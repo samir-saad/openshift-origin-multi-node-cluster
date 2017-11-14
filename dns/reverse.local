@@ -1,0 +1,22 @@
+$TTL 86400
+@   IN  SOA     toolbox.local.net. root.local.net. (
+        2011071001  ;Serial
+        3600        ;Refresh
+        1800        ;Retry
+        604800      ;Expire
+        86400       ;Minimum TTL
+)
+
+@			IN  NS      toolbox.local.net.
+@			IN  PTR     local.net.
+toolbox		IN  A	192.168.1.100
+master		IN  A	192.168.1.101
+infra		IN  A	192.168.1.110
+node1		IN  A	192.168.1.111
+node2		IN  A	192.168.1.112
+
+100			IN  PTR		toolbox.local.net.
+101			IN  PTR		master.local.net.
+110			IN  PTR		infra.local.net.
+111			IN  PTR		node1.local.net.
+112			IN  PTR		node2.local.net.

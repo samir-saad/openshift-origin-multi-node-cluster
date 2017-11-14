@@ -1,0 +1,20 @@
+#require 'rbconfig'
+
+#def is_windows
+#  RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/
+#end
+#
+#def provision_ansible(config)
+#  if is_windows
+#    # Provisioning configuration for shell script.
+#    config.vm.provision "shell" do |sh|
+#      sh.path = "scripts/playbook-win.sh"
+#    end
+#  else
+#    # Provisioning configuration for Ansible (for Mac/Linux hosts).
+#    config.vm.provision "ansible" do |ansible|
+#      ansible.playbook = "ansible/site.yml"
+#      ansible.sudo = true
+#    end
+#  end
+#end
