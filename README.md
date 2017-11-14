@@ -1,6 +1,7 @@
 # OpenShift Origin Multi-Node Cluster
 
 An OpenShift 3.6 cluster of 5 machine:
+
 | Machine  | Hostname          | IP             | Description |
 | :------- | :----             | :---:          | :---- |
 | Toolbox  | toolbox.local.net |  192.168.1.100 | Ansible, Bind DNS, and NFS storage |
@@ -19,6 +20,7 @@ This demo environment requires a machine of:
  - 4 cores
  - 16 GB RAM
  - 40 GB free disk space
+ 
 | Machine | CPU | Memory  | Primary Disk             | Secondary Disk |
 | :------ | :-: | :-----: | :----                    | :---- |
 | Toolbox | 1   | 2048 MB | 40 GB dynamic allocation | NA    |
@@ -33,6 +35,7 @@ This demo environment requires a machine of:
 >  
 >  - Remove node2 at the end of the file.
 >  - Adjust machines memory to be:
+>
 >  | Machine | Memory  | 
 >  | :------  | :-----: | 
 >  | Toolbox | 512 MB   |
@@ -45,6 +48,7 @@ This demo environment requires a machine of:
 
 ## Prerequisites
 The following steps are tested on a Windows host machine.
+
 ### Install VirtualBox
 
  1. Install [VirtualBox 1.5](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1)
@@ -61,12 +65,14 @@ vagrant plugin install vagrant-vbguest
 
 ## Network
 All the machines are configures with NAT and Host Only adapters. 
+
 > **Note:**
 > The network may not behave properly over VPN, please disable any VPN before running the cluster.
 
 
 ## Cluster Provisioning
 Clone the repository.
+
 > **Recommendation:**
 >   It's recommended to change the SSK keys under keys directory.
 
@@ -84,6 +90,7 @@ The command will start the machines in the following order:
 As it's the first run of the machines, Vagrant will run provisioning scripts to install any required tools and configure the machines connectivity and networking.
 
 ## Connecting to The Cluster
+
 ### Test  Network Connectivity
 Firstly, try to ping the cluster machines from your host:
 ```sh
@@ -109,12 +116,14 @@ ping toolbox.local.net
 Use your preferred SSH Client to connect to the machines. I personally recommend [MobaXterm](https://mobaxterm.mobatek.net/).
 Use the private key in the /keys directory to connect.
 Machines Users:
+
 | User    | Password | 
 | :------ | :------  | 
 | root    | vagrant  |
 | vagrant | vagrant  | 
 
 ## Installation and Configuration
+
 > **Recommendation:**
 >  I recommend that you take snapshots of the machines at this point, so you call roll back to them.
 
