@@ -73,12 +73,12 @@ All the machines are configures with NAT and Host Only adapters.
 
 ## Cluster Provisioning
 
- - Clone the repository.
+ - Clone or download this repository to your host machine.
 
 > **Recommendation:**
 >   It's recommended to change the SSK keys under keys directory.
 
- - And run the following command
+ - Navigate to your local copy and run the following command
 ```sh
 cluster init [parallel]
 ```
@@ -117,6 +117,10 @@ Now, we need to cluster DNS to host in order to resolve machines hostnames:
  - Try to ping using machine hostname:
 ```sh
 ping toolbox.local.net
+```
+ - Test the wildcard DNS:
+```sh
+ping XYZ.cloudapps.local.net
 ```
  
 ### SSH Connection to Cluster Machines
