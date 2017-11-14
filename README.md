@@ -10,10 +10,6 @@ An OpenShift 3.6 cluster of 5 machine:
 | Node1    | node1.local.net   |  192.168.1.111 | Worker node |
 | Node2    | node2.local.net   |  192.168.1.112 | Worker node |
 
-## Table of Content
-[TOC]
-
-
 
 ## Hardware Requirements
 This demo environment requires a machine of:
@@ -29,8 +25,10 @@ This demo environment requires a machine of:
 | Node1   | 1   | 3072 MB | 40 GB dynamic allocation | 20 GB, dynamic, for Docker storage |
 | Node2   | 1   | 3072 MB | 40 GB dynamic allocation | 20 GB, dynamic, for Docker storage |
 
+
 > **Note:**
 >  If your machine has 8 GB RAM you can do the following:
+>  
 >  **1. Edit the machines-config.yml:**
 >  
 >  - Remove node2 at the end of the file.
@@ -46,19 +44,21 @@ This demo environment requires a machine of:
 >  **2. Edit /ansible/ansible-hosts.yaml: remove node2 from [worker_nodes] group.**
 
 
+
+
 ## Prerequisites
 The following steps are tested on a Windows host machine.
 
 ### Install VirtualBox
 
- 1. Install [VirtualBox 1.5](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1)
+ - Install [VirtualBox 1.5](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1)
  Check the [comparability](https://www.vagrantup.com/docs/virtualbox) between Vagrant and VirtualBox first. 
- 2. Download the [Extension Pack](http://download.virtualbox.org/virtualbox/5.1.30/Oracle_VM_VirtualBox_Extension_Pack-5.1.30-118389.vbox-extpack) and add it to VirtualBox: **File --> Preferences --> Extensions --> Add**
+ - Download the [Extension Pack](http://download.virtualbox.org/virtualbox/5.1.30/Oracle_VM_VirtualBox_Extension_Pack-5.1.30-118389.vbox-extpack) and add it to VirtualBox: **File --> Preferences --> Extensions --> Add**
 
 ### Install Vagrant 
- 1. Install [Vagrant](https://www.vagrantup.com/downloads.html). This environment has been tested with Vagrant 1.9.7
+ - Install [Vagrant](https://www.vagrantup.com/downloads.html). This environment has been tested with Vagrant 1.9.7
  
- 2. Install Vagrant VirtualBox Guest Plugin
+ - Install Vagrant VirtualBox Guest Plugin
 ```sh
 vagrant plugin install vagrant-vbguest
 ```
@@ -70,24 +70,31 @@ All the machines are configures with NAT and Host Only adapters.
 > The network may not behave properly over VPN, please disable any VPN before running the cluster.
 
 
+
 ## Cluster Provisioning
-Clone the repository.
+
+ - Clone the repository.
 
 > **Recommendation:**
 >   It's recommended to change the SSK keys under keys directory.
 
-And run the following command
+ - And run the following command
 ```sh
 cluster init [parallel]
 ```
-The command will start the machines in the following order:
- 1. master, infra, node1, and node2
- 2. toolbox
+
+> **Note:**
+>  The command will start the machines in the following order:
+>  1. master, infra, node1, and node2
+>  2. toolbox
  
 > **Note:**
 >  The second argument 'parallel' is optional. It directs vagrant to start machines in parallel when possible.
  
-As it's the first run of the machines, Vagrant will run provisioning scripts to install any required tools and configure the machines connectivity and networking.
+> **Note:**
+>  As it's the first run of the machines, Vagrant will run provisioning scripts to install any required tools and configure the machines connectivity and networking.
+
+
 
 ## Connecting to The Cluster
 
@@ -122,6 +129,8 @@ Machines Users:
 | root    | vagrant  |
 | vagrant | vagrant  | 
 
+
+
 ## Installation and Configuration
 
 > **Recommendation:**
@@ -131,6 +140,7 @@ Connect to the Toolbox machine, and make sure that Ansible can reach to all the 
 ```sh
 ansible cluster -m ping
 ```
+
 ### Docker
 
  - Install Docker and configure its storage:
@@ -141,8 +151,10 @@ ansible-playbook /vagrant/ansible/playbooks/setup-docker.yml
 ```sh
 ansible-playbook /vagrant/ansible/playbooks/populate-docker-registry.yml
 ```
+
 > **Recommendation:**
 >  Take snapshots of machines: master, infra, node1, and node1.
+
 
 ## OpenShift
  
@@ -166,6 +178,7 @@ ansible-playbook /vagrant/ansible/playbooks/openshift-post-install.yml
  https://registry-console-default.cloudapps.local.net
 
  
+ 
 ## Cluster Control 
 
  - Start the Cluster:
@@ -176,6 +189,7 @@ cluster up [parallel]
 ```sh
 cluster down
 ```
+
 
 ## Next Enhancements
 
