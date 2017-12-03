@@ -3,9 +3,9 @@
 #
 # Bash shell settings: exit on failing commands, unbound variables
 #
-set -o errexit
-set -o nounset
-set -o pipefail
+#set -o errexit
+#set -o nounset
+#set -o pipefail
 
 #
 # Variables
