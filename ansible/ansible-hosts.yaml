@@ -7,9 +7,9 @@ nfs
 ansible_ssh_user=root
 debug_level=2
 openshift_deployment_type=origin
-openshift_release=v3.6
-openshift_image_tag=v3.6.0
-openshift_pkg_version=-3.6.0
+openshift_release=v3.6.1
+openshift_image_tag=v3.6.1
+openshift_pkg_version=-3.6.1
 
 # Skip memory and disk check
 openshift_disable_check=disk_availability,memory_availability
