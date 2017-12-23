@@ -1,5 +1,6 @@
 [OSEv3:children]
 masters
+etcd
 nodes
 nfs
 
@@ -7,9 +8,9 @@ nfs
 ansible_ssh_user=root
 debug_level=2
 openshift_deployment_type=origin
-openshift_release=v3.6.1
-openshift_image_tag=v3.6.1
-openshift_pkg_version=-3.6.1
+openshift_release=v3.7.0
+openshift_image_tag=v3.7.0
+openshift_pkg_version=-3.7.0
 
 # Skip memory and disk check
 openshift_disable_check=disk_availability,memory_availability
@@ -83,12 +84,16 @@ infra.local.net ansible_host=192.168.1.110 openshift_hostname=infra.local.net op
 [masters]
 master.local.net ansible_host=192.168.1.101 openshift_hostname=master.local.net openshift_public_hostname=master.local.net openshift_ip=192.168.1.101 openshift_public_ip=192.168.1.101  openshift_node_labels="{'region': 'infra'}"
 
+[etcd:children]
+masters
+
 [worker_nodes]
 node1.local.net ansible_host=192.168.1.111 openshift_hostname=node1.local.net openshift_public_hostname=node1.local.net openshift_ip=192.168.1.111 openshift_public_ip=192.168.1.111  openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
 node2.local.net ansible_host=192.168.1.112 openshift_hostname=node2.local.net openshift_public_hostname=node2.local.net openshift_ip=192.168.1.112 openshift_public_ip=192.168.1.112  openshift_node_labels="{'region': 'primary', 'zone': 'west'}"
 
 [nodes:children]
 masters
+etcd
 infra
 worker_nodes
 
