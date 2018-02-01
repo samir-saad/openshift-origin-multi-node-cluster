@@ -51,7 +51,7 @@ The following steps are tested on a Windows host machine.
 
 ### Install VirtualBox
 
- - Install [VirtualBox 1.5](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1)
+ - Install [VirtualBox 5.1](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1)
  Check the [comparability](https://www.vagrantup.com/docs/virtualbox) between Vagrant and VirtualBox first. 
  - Download the [Extension Pack](http://download.virtualbox.org/virtualbox/5.1.30/Oracle_VM_VirtualBox_Extension_Pack-5.1.30-118389.vbox-extpack) and add it to VirtualBox: **File --> Preferences --> Extensions --> Add**
 
@@ -76,7 +76,7 @@ All the machines are configures with NAT and Host Only adapters.
  - Clone or download this repository to your host machine.
 
 > **Recommendation:**
->   It's recommended to change the SSK keys under keys directory.
+>   It's recommended to change the SSH keys under keys directory.
 
  - Navigate to your local copy and run the following command
 ```sh
@@ -140,7 +140,7 @@ Machines Users:
 > **Recommendation:**
 >  I recommend that you take snapshots of the machines at this point, so you call roll back to them.
 
-Connect to the Toolbox machine, and make sure that Ansible can reach to all the cluster machines:
+Connect to the Toolbox machine as root, and make sure that Ansible can reach to all the cluster machines:
 ```sh
 ansible cluster -m ping
 ```
