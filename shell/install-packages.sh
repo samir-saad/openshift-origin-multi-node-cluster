@@ -27,9 +27,6 @@ done
 main() {
   info "Install packages: $packages"
   bulk_install $packages
-  
-  info "Update packages."
-  update_packages
 }
 
 main

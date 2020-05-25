@@ -21,10 +21,10 @@ configure_dns() {
   cp -f /vagrant/dns/named.conf /etc/named.conf
   
   info "Copy forward and reverse configurations"
-  cp -f /vagrant/dns/forward.local /var/named/forward.local
-  cp -f /vagrant/dns/reverse.local /var/named/reverse.local
+  cp -f /vagrant/dns/forward.ocp.local /var/named/forward.ocp.local
+  cp -f /vagrant/dns/reverse.ocp.local /var/named/reverse.ocp.local
   info "Copy wildcard and subdomain configurations"
-  cp -f /vagrant/dns/forward.cloudapps.local /var/named/forward.cloudapps.local
+  cp -f /vagrant/dns/forward.cloudapps.ocp.local /var/named/forward.cloudapps.ocp.local
   
   info "Configuring Permissions"
   chgrp named -R /var/named
@@ -57,21 +57,21 @@ test_dns() {
   named-checkconf /etc/named.conf
   
   info "Check Forward zone"
-  named-checkzone local.net /var/named/forward.local
+  named-checkzone ocp.local.net /var/named/forward.ocp.local
   
   info "Check Reverse zone"
-  named-checkzone local.net /var/named/reverse.local
+  named-checkzone ocp.local.net /var/named/reverse.ocp.local
   
   info "Check Wildcard zone"
-  named-checkzone cloudapps.local.net /var/named/forward.cloudapps.local
+  named-checkzone cloudapps.ocp.local.net /var/named/forward.cloudapps.ocp.local
   
   info "Test DNS server"
-  dig infra.local.net
-  nslookup local.net
+  dig infra.ocp.local.net
+  nslookup ocp.local.net
   
   info "Test Wildcard"
-  dig XXX.cloudapps.local.net
-  nslookup cloudapps.local.net
+  dig XXX.cloudapps.ocp.local.net
+  nslookup cloudapps.ocp.local.net
 }
 
 main() {

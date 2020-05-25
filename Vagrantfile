@@ -36,15 +36,16 @@ Vagrant.configure("2") do |config|
     name              = machine['name']
     hostname          = machine['name'] + '.' + commonConfig['domain']
     ip                = machine['ip']
+	machine['gateway']= machine['gateway'] ||= commonConfig['default.gateway']
     box               = machine['box'] ||= commonConfig['box']
-    memory            = machine['memory'] ||= commonConfig['memory.default']
-    cpus              = machine['cpus'] ||= commonConfig['cpus.default']
+    memory            = machine['memory'] ||= commonConfig['default.memory']
+    cpus              = machine['cpus'] ||= commonConfig['default.cpus']
     machineFolders    = machine['synced_folders']
     machineDisks      = machine['disks']
     machineProvisions = machine['provisions']
     
-	$provisioned = File.exist?(".vagrant/machines/#{name}/virtualbox/action_provision")
-	
+    $provisioned = File.exist?(".vagrant/machines/#{name}/virtualbox/action_provision")
+    
     ## Configure node
     config.vm.define name do |cfg|
 
@@ -52,13 +53,14 @@ Vagrant.configure("2") do |config|
        cfg.vm.hostname = hostname
 
        ## Comment public network to disable bridge
-       ## Bridged network --> cfg.vm.network :public_network
+       ## Bridged network --> 
+       ## cfg.vm.network :public_network, ip: ip
        ## cfg.vm.network :private_network, ip: ip
-       cfg.vm.network :private_network, network_options(machine)
-       
-	   cfg.vm.provision "shell",
+        cfg.vm.network :public_network, network_options(machine)
+	   
+       cfg.vm.provision "shell",
          inline: "sudo mkdir -p /vagrant; sudo chown vagrant:vagrant /vagrant"
-	
+    
        ## Sync folders
        sync_folders(cfg.vm, commonFolders)
        sync_folders(cfg.vm, machineFolders)
@@ -75,7 +77,7 @@ Vagrant.configure("2") do |config|
          create_disks(vb, commonDisks)
          create_disks(vb, machineDisks)
        end
-
+       
        ## provisioning
        run_provisions(cfg, commonProvisions, hostname, ip)
        run_provisions(cfg, machineProvisions, hostname, ip)

@@ -7,8 +7,11 @@
   tasks:        
     - name: Install OpenShift Repositories on All Nodes
       yum:
-        name: centos-release-openshift-origin
+        name: "{{ item }}"
         state: latest
+      with_items:
+        - centos-release-openshift-origin311
+        - epel-release
     
     - name: List Repositories
       command: yum repolist
@@ -19,6 +22,6 @@
     - name: Install OpenShift Utils on Ansible Machine
       when: inventory_hostname in groups.ansible
       yum:
-        name: atomic-openshift-utils
+        name: openshift-ansible
         state: latest
         

@@ -4,11 +4,11 @@ An OpenShift 3.6 cluster of 5 machine:
 
 | Machine  | Hostname          | IP             | Description |
 | :------- | :----             | :---:          | :---- |
-| Toolbox  | toolbox.local.net |  192.168.1.100 | Ansible, Bind DNS, and NFS storage |
-| Master   | master.local.net  |  192.168.1.101 | Cluster Master node |
-| Infra    | infra.local.net   |  192.168.1.110 | Infra Node hosting Docker registry and HA Proxy router |
-| Node1    | node1.local.net   |  192.168.1.111 | Worker node |
-| Node2    | node2.local.net   |  192.168.1.112 | Worker node |
+| Toolbox  | toolbox.ocp.local.net |  10.0.1.100 | Ansible, Bind DNS, and NFS storage |
+| Master   | master.ocp.local.net  |  10.0.1.101 | Cluster Master node |
+| Infra    | infra.ocp.local.net   |  10.0.1.110 | Infra Node hosting Docker registry and HA Proxy router |
+| Node1    | node1.ocp.local.net   |  10.0.1.111 | Worker node |
+| Node2    | node2.ocp.local.net   |  10.0.1.112 | Worker node |
 
 
 ## Hardware Requirements
@@ -51,7 +51,7 @@ The following steps are tested on a Windows host machine.
 
 ### Install VirtualBox
 
- - Install [VirtualBox 5.1](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1)
+ - Install [VirtualBox 1.5](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1)
  Check the [comparability](https://www.vagrantup.com/docs/virtualbox) between Vagrant and VirtualBox first. 
  - Download the [Extension Pack](http://download.virtualbox.org/virtualbox/5.1.30/Oracle_VM_VirtualBox_Extension_Pack-5.1.30-118389.vbox-extpack) and add it to VirtualBox: **File --> Preferences --> Extensions --> Add**
 
@@ -76,7 +76,7 @@ All the machines are configures with NAT and Host Only adapters.
  - Clone or download this repository to your host machine.
 
 > **Recommendation:**
->   It's recommended to change the SSH keys under keys directory.
+>   It's recommended to change the SSK keys under keys directory.
 
  - Navigate to your local copy and run the following command
 ```sh
@@ -101,26 +101,26 @@ cluster init [parallel]
 ### Test  Network Connectivity
 Firstly, try to ping the cluster machines from your host:
 ```sh
-ping 192.168.1.100
-ping 192.168.1.101
-ping 192.168.1.110
-ping 192.168.1.111
-ping 192.168.1.112
+ping 10.0.1.100
+ping 10.0.1.101
+ping 10.0.1.110
+ping 10.0.1.111
+ping 10.0.1.112
 ```
 ### Add Cluster DNS to Host Machine
 Now, we need to cluster DNS to host in order to resolve machines hostnames:
 
  - Go to **Network Connections**
  - Select the **VirtualBox Host-Only Network --> Properties --> Internet Protocol version 4 --> Properties**
- - Make sure that the IP addressis **192.168.1.1**, otherwise, try another adapter.
- - Add DNS server **192.168.1.100** and save.
+ - Make sure that the IP addressis **10.0.1.1**, otherwise, try another adapter.
+ - Add DNS server **10.0.1.100** and save.
  - Try to ping using machine hostname:
 ```sh
-ping toolbox.local.net
+ping toolbox.ocp.local.net
 ```
  - Test the wildcard DNS:
 ```sh
-ping XYZ.cloudapps.local.net
+ping XYZ.cloudapps.ocp.local.net
 ```
  
 ### SSH Connection to Cluster Machines
@@ -140,7 +140,7 @@ Machines Users:
 > **Recommendation:**
 >  I recommend that you take snapshots of the machines at this point, so you call roll back to them.
 
-Connect to the Toolbox machine as root, and make sure that Ansible can reach to all the cluster machines:
+Connect to the Toolbox machine, and make sure that Ansible can reach to all the cluster machines:
 ```sh
 ansible cluster -m ping
 ```
@@ -176,10 +176,10 @@ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
 ansible-playbook /vagrant/ansible/playbooks/openshift-post-install.yml
 ```
  - Now, try to login to OpenShift Console from host machine
- https://master.local.net:8443
+ https://master.ocp.local.net:8443
  Accept the certificate and use admin/admin to login
  - Also try the Docker registry
- https://registry-console-default.cloudapps.local.net
+ https://registry-console-default.cloudapps.ocp.local.net
 
  
  

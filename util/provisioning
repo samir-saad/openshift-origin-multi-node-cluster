@@ -74,6 +74,12 @@ def run_shell(cfg, provision)
   end
 end
 
+def run_script(cfg, script)
+  cfg.vm.provision :shell do |shell|
+    shell.path = script
+  end
+end
+
 def run_ansible_playbook(cfg, provision, hostname, ip)
   cfg.vm.provision :ansible do |ansible|
     ansible.playbook = provision['playbook']

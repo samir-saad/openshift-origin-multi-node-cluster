@@ -1,7 +1,7 @@
 ---
 
 - name: Openshift Post Installation
-  hosts: master.local.net
+  hosts: master.ocp.local.net
   become: yes
   
   tasks: 
@@ -24,8 +24,11 @@
         var: out.stdout_lines
         
     - name: Annotate namespace default to use selector region=infra
-      command: oc annotate namespace default openshift.io/node-selector='region=infra' --overwrite
+      command: oc annotate namespace default openshift.io/node-selector='function=registry-router' --overwrite
 
+    - name: Annotate registry console DC to use selector region=infra
+      command: oc patch dc registry-console -n default -p '{"spec":{"template":{"spec":{"nodeSelector":{"function":"registry-router"}}}}}'
+      
     - name: Add user admin
       command: useradd admin
 
@@ -33,5 +36,5 @@
       command: htpasswd -cb /etc/origin/master/htpasswd admin admin
      
     - name: Grant role admin to use admin on default namespace
-      command: oc policy add-role-to-user admin admin -n default
+      command: oc adm policy add-cluster-role-to-user cluster-admin admin
         

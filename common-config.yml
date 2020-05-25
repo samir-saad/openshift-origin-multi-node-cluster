@@ -1,8 +1,9 @@
 ---
    box: "centos/7"
-   domain: "local.net"
-   memory.default: 1024
-   cpus.default: 1
+   domain: "ocp3.local.net"
+   default.memory: 1024
+   default.cpus: 1
+   default.gateway: 192.168.2.1
 
 #   synced_folders:
 #      - src: keys
@@ -21,16 +22,32 @@
 #     - type: ansible
 #       playbook: playbook/basic_conf.yaml
 #       args:
-#       
+
+     - type: shell
+       script: shell/update-packages.sh
+       args:
+       
      - type: shell
        script: shell/install-packages.sh
-       args: --packages "wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct NetworkManager"
+       args: --packages "wget git net-tools bind-utils yum-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct NetworkManager glusterfs-fuse"
        
      - type: shell
        script: shell/network_conf.sh
-       args: --dns "192.168.1.100"
+       args: --dns "192.168.2.100"
+       
+     - type: shell
+       script: shell/ntpd_conf.sh
+       args:
+       
+     - type: shell
+       script: shell/timezone_conf.sh
+       args: --timezone "Canada/Eastern"
        
      - type: shell
        script: shell/sshd_conf.sh
        args:
+       
+     - type: shell
+       script: shell/network_fix.sh
+       args: 
    

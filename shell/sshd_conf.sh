@@ -43,6 +43,7 @@ configure_sshd() {
 }
 
 main() {
+  info "Add ssh keys"
   add_private_key $ROOT_SSH_HOME
   add_private_key $VAGRANT_SSH_HOME
   

@@ -16,6 +16,10 @@ def network_options(host)
     options[:type] = 'dhcp'
   end
 
+  if host.has_key?('gateway')
+    options[:gateway] = host['gateway']
+  end
+  
   if host.has_key?('mac')
     options[:mac] = host['mac'].gsub(/[-:]/, '')
   end
