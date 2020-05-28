@@ -70,8 +70,16 @@ install_fedora() {
 
 # Install on a CentOS system from EPEL
 install_centos() {
-  info "CentOS: installing $@"
-  yum -y install $@
+  version=$(cut --fields=4 --delimiter=' ' '/etc/redhat-release' | cut -c1)
+  info "CentOS ${version}: install packages $@"
+  if [ "${version}" == "8" ]
+  then
+    info "Using dnf pakage manager"
+    dnf -y install $@
+  else
+    info "Using yum pakage manager"
+    yum -y install $@
+  fi
 }
 
 # Install on a recent Ubuntu distribution, from the PPA
@@ -83,7 +91,7 @@ install_ubuntu() {
 update_packages() {
   distro=$(get_linux_distribution)
   "update_${distro}" || die "Distribution ${distro} is not supported"
-  
+
   info "${distro} updated"
 }
 
@@ -93,8 +101,16 @@ update_fedora() {
 }
 
 update_centos() {
-  info "CentOS: Update packages"
-  yum -y update
+  version=$(cut --fields=4 --delimiter=' ' '/etc/redhat-release' | cut -c1)
+  info "CentOS ${version}: Update packages"
+  if [ "${version}" == "8" ]
+  then
+    info "Using dnf pakage manager"
+    dnf -y update
+  else
+    info "Using yum pakage manager"
+    yum -y update
+  fi
 }
 
 update_ubuntu() {
@@ -103,12 +119,12 @@ update_ubuntu() {
 }
 
 add_firewall_rules() {
-  info "Add firewall rules $@"  
+  info "Add firewall rules $@"
   for i in $@; do
     info "rule: $i"
     firewall-cmd --permanent --add-port=$i;
   done
-  
+
   info "Reload Firewall"
   firewall-cmd --reload
 }
@@ -116,7 +132,7 @@ add_firewall_rules() {
 add_iptables_rule() {
   info "Add iptables rule $@"
   iptables -I INPUT 1 -p $1 --dport $2 -s $3 -j ACCEPT;
-  
+
   info "Save iptables rule"
   iptables-save > /etc/sysconfig/iptables
 }
