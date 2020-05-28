@@ -14,26 +14,31 @@ def sync_folders(vm, folders)
   end
 end
 
-def create_disks(vb, disks)
+def create_disks(vb, disks, commonConfig, machine)
   if !disks.nil? && !disks.empty?
+    port = 0
     disks.each do |disk|
-      unless File.exist?(disk['location'])
-		 disk['format'] ||= 'VDI'
-		 if !disk['location'].end_with? ".#{disk['format']}".downcase
-		   disk['location'] = [disk['location'], disk['format'].downcase].join('.')
-		 end
-	     info("Creating disk: #{disk} ")
-		 if disk['fixed']
-		   info("Fixed allocation\n")
-		   vb.customize ['createhd', '--filename', disk['location'], '--format', disk['format'], '--variant', 'Fixed', '--size', disk['size'] * 1024]
-		 else
-		   info("Dynamic allocation\n")
-           vb.customize ['createhd', '--filename', disk['location'], '--format', disk['format'], '--size', disk['size'] * 1024]
-		 end
+      disk['format'] ||= commonConfig['default.disk.format'] ||= 'VDI'
+      disk['controller'] ||= commonConfig['default.disk.controller'] ||= 'SATA Controller'
+      disk_location ||= "disks/" + machine['name'] + "-" + disk['name']
+      port += 1
+
+      if !disk_location.end_with? ".#{disk['format']}".downcase
+        disk_location = [disk_location, disk['format'].downcase].join('.')
       end
-	  ## 'SATA Controller', 'IDE Controller'
-	  controller = disk['controller'] ||= 'IDE'
-      vb.customize ['storageattach', :id,  '--storagectl', controller, '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk['location']]
+      
+      unless File.exist?(disk_location)
+        info("Creating disk: #{disk} ")
+        if disk['fixed']
+          info("Fixed allocation\n")
+          vb.customize ['createhd', '--filename', disk_location, '--format', disk['format'], '--variant', 'Fixed', '--size', disk['size'] * 1024]
+        else
+          info("Dynamic allocation\n")
+          vb.customize ['createhd', '--filename', disk_location, '--format', disk['format'], '--size', disk['size'] * 1024]
+        end
+      end
+      ## 'SATA Controller', 'IDE Controller'
+      vb.customize ['storageattach', :id,  '--storagectl', disk['controller'], '--port', port, '--device', 0, '--type', 'hdd', '--medium', disk_location]
     end
   end
 end
@@ -45,16 +50,16 @@ def run_provisions(cfg, provisions, hostname, ip)
       case provision['type']
       when 'file'
         run_file(cfg, provision)
-        
+
       when 'shell'
         run_shell(cfg, provision)
-        
+
       when 'ansible'
         run_ansible_playbook(cfg, provision, hostname, ip)
-        
+
       else
         info('Unsupported provisioner.\n')
-        
+
       end
     end
   end
@@ -89,7 +94,7 @@ def run_ansible_playbook(cfg, provision, hostname, ip)
     ## Enable debugging
     ansible.verbose = true
     ansible.verbose = "vvvvv"
-    
+
     ansible.host_vars = {
        hostname => {
          "ansible_host" => ip
