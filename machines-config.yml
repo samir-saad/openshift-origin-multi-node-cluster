@@ -1,95 +1,77 @@
 ---
-  # Ansible and Ansible Tower, Bind DNS, and NFS Storage
+  # Ansible and NFS Storage
   - name: toolbox
     ip:   192.168.2.201
     memory: 1024
     cpus: 1
-    
+
+    disks:
+      - name: exports
+        size: 100
+
     provisions:
-      - type: file
-        src: ansible
-        dest: /vagrant/ansible
-        
-      - type: shell
-        script: shell/setup_ansible.sh
-        args:
+     - type: file
+       src: ansible
+       dest: /vagrant/ansible
+
+     - type: shell
+       script: shell/setup_ansible.sh
+       args:
+
+     - type: shell
+       script: shell/create_disk_partition.sh
+       args: --disk "/dev/sdc" --label "msdos" --type "primary" --start "0" --end "100%" --fs "ext4"
+
+     - type: shell
+       script: shell/disk_mount.sh
+       args: --disk "/dev/sdc1" --dest "/exports"
 
   # Cluster Master
   - name: master
     ip:   192.168.2.205
     memory: 4096
     cpus: 2
-    
+
     disks:
-      - location: disks/master-docker
+      - name: docker
         size: 15
-        
+
   # Docker Register, and HA Proxy
   - name: infra
     ip:   192.168.2.210
     memory: 4096
     cpus: 2
-    
+
     disks:
-      - location: disks/infra-docker        
-        size: 20
-        
-  # Metrics
-  - name: metrics
-    ip:   192.168.2.215
-    memory: 12288
-    cpus: 4
-    
-    disks:
-      - location: disks/metrics-docker        
+      - name: docker
         size: 20
 
   # Worker node1
   - name: node1
     ip:   192.168.2.211
-    memory: 8192
+    memory: 12288
     cpus: 4
-    
+
     disks:
-      - location: disks/node1-docker
+      - name: docker
         size: 40
 
   # Worker node2
   - name: node2
     ip:   192.168.2.212
-    memory: 8192
+    memory: 12288
     cpus: 4
-    
+
     disks:
-      - location: disks/node2-docker
+      - name: docker
         size: 40
-  
-  # Gluster node1
-  - name: gluster1
-    ip:   192.168.2.202
-    memory: 2048
-    cpus: 2
-    
+
+  # Worker node3
+  - name: node3
+    ip:   192.168.2.213
+    memory: 12288
+    cpus: 4
+
     disks:
-      - location: disks/gluster1-storage
-        size: 100
-        
-  # Gluster node2
-  - name: gluster2
-    ip:   192.168.2.203
-    memory: 2048
-    cpus: 2
-    
-    disks:
-      - location: disks/gluster2-storage
-        size: 100
-        
-  # Gluster node3
-  - name: gluster3
-    ip:   192.168.2.204
-    memory: 2048
-    cpus: 2
-    
-    disks:
-      - location: disks/gluster3-storage
-        size: 100
+      - name: docker
+        size: 40
