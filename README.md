@@ -16,7 +16,7 @@ This demo environment requires a machine of:
  - 4 cores
  - 16 GB RAM
  - 40 GB free disk space
- 
+
 | Machine | CPU | Memory  | Primary Disk             | Secondary Disk |
 | :------ | :-: | :-----: | :----                    | :---- |
 | Toolbox | 1   | 2048 MB | 40 GB dynamic allocation | NA    |
@@ -34,11 +34,11 @@ This demo environment requires a machine of:
 >  - Remove node2 at the end of the file.
 >  - Adjust machines memory to be:
 >
->  | Machine | Memory  | 
->  | :------  | :-----: | 
+>  | Machine | Memory  |
+>  | :------  | :-----: |
 >  | Toolbox | 512 MB   |
->  | Master   | 2048 MB | 
->  | Infra      | 2048 MB | 
+>  | Master   | 2048 MB |
+>  | Infra      | 2048 MB |
 >  | Node1   | 2048 MB |
 >  
 >  **2. Edit /ansible/ansible-hosts.yaml: remove node2 from [worker_nodes] group.**
@@ -52,19 +52,19 @@ The following steps are tested on a Windows host machine.
 ### Install VirtualBox
 
  - Install [VirtualBox 1.5](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1)
- Check the [comparability](https://www.vagrantup.com/docs/virtualbox) between Vagrant and VirtualBox first. 
+ Check the [comparability](https://www.vagrantup.com/docs/virtualbox) between Vagrant and VirtualBox first.
  - Download the [Extension Pack](http://download.virtualbox.org/virtualbox/5.1.30/Oracle_VM_VirtualBox_Extension_Pack-5.1.30-118389.vbox-extpack) and add it to VirtualBox: **File --> Preferences --> Extensions --> Add**
 
-### Install Vagrant 
+### Install Vagrant
  - Install [Vagrant](https://www.vagrantup.com/downloads.html). This environment has been tested with Vagrant 1.9.7
- 
+
  - Install Vagrant VirtualBox Guest Plugin
 ```sh
 vagrant plugin install vagrant-vbguest
 ```
 
 ## Network
-All the machines are configures with NAT and Host Only adapters. 
+All the machines are configures with NAT and Host Only adapters.
 
 > **Note:**
 > The network may not behave properly over VPN, please disable any VPN before running the cluster.
@@ -87,10 +87,10 @@ cluster init [parallel]
 >  The command will start the machines in the following order:
 >  1. master, infra, node1, and node2
 >  2. toolbox
- 
+
 > **Note:**
 >  The second argument 'parallel' is optional. It directs vagrant to start machines in parallel when possible.
- 
+
 > **Note:**
 >  As it's the first run of the machines, Vagrant will run provisioning scripts to install any required tools and configure the machines connectivity and networking.
 
@@ -122,16 +122,16 @@ ping toolbox.ocp.local.net
 ```sh
 ping XYZ.cloudapps.ocp.local.net
 ```
- 
+
 ### SSH Connection to Cluster Machines
 Use your preferred SSH Client to connect to the machines. I personally recommend [MobaXterm](https://mobaxterm.mobatek.net/).
 Use the private key in the /keys directory to connect.
 Machines Users:
 
-| User    | Password | 
-| :------ | :------  | 
+| User    | Password |
+| :------ | :------  |
 | root    | vagrant  |
-| vagrant | vagrant  | 
+| vagrant | vagrant  |
 
 
 
@@ -161,15 +161,15 @@ ansible-playbook /vagrant/ansible/playbooks/populate-docker-registry.yml
 
 
 ## OpenShift
- 
 
- - Install OpenShift Prerequisites: 
+
+ - Install OpenShift Prerequisites:
 ```sh
 ansible-playbook /vagrant/ansible/playbooks/openshift-pre-install.yml
 ```
  - Install OpenShift:
 ```sh
-ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
 ```
  - Configure OpenShift:
 ```sh
@@ -181,9 +181,9 @@ ansible-playbook /vagrant/ansible/playbooks/openshift-post-install.yml
  - Also try the Docker registry
  https://registry-console-default.cloudapps.ocp.local.net
 
- 
- 
-## Cluster Control 
+
+
+## Cluster Control
 
  - Start the Cluster:
 ```sh

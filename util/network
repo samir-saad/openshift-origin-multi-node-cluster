@@ -19,7 +19,11 @@ def network_options(host)
   if host.has_key?('gateway')
     options[:gateway] = host['gateway']
   end
-  
+
+  if host.has_key?('interface')
+    options[:bridge] = host['interface']
+  end
+
   if host.has_key?('mac')
     options[:mac] = host['mac'].gsub(/[-:]/, '')
   end

@@ -34,22 +34,22 @@ EOF
 }
 
 configure_network_manager() {
-  info "Configure NetworkManager"  
-  
+  info "Configure NetworkManager"
+
   # Disable DNS Overriding
   sed -i "/\[main\]/a dns=none" /etc/NetworkManager/NetworkManager.conf
-  
+
   # Restart NetworkManager
-  systemctl restart NetworkManager
+  systemctl restart network NetworkManager
 }
 
 add_dns() {
-  info "Adding DNS"  
-  
+  info "Adding DNS"
+
   sed -i "/local.net/a nameserver $dns" /etc/resolv.conf
-  
+
   # Restart network
-  systemctl restart network
+  systemctl restart NetworkManager
 }
 
 main() {

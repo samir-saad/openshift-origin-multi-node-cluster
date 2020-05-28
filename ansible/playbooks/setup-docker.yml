@@ -3,33 +3,33 @@
 - name: Install and Configure Docker
   hosts: nodes
   become: yes
-  
-  tasks:        
+
+  tasks:
     - name: Uninstall Previous Docker Packages
       yum:
         name: docker
         state: absent
-    
+
     - name: Install Docker
       yum:
         name: docker
         state: latest
-        
+
     - name: Stop Docker Service
       service:
         name: docker
         state: stopped
-    
+
     - name: Cleaning up Docker Configurations
       file:
         path: /var/lib/docker
         state: absent
-    
+
     - name: Create Docker Storage Configurations
       shell:
         cmd: |
           cat <<EOF > /etc/sysconfig/docker-storage-setup
-          DEVS=/dev/sdb
+          DEVS=/dev/sdc
           VG=docker-vg
           EOF
 
@@ -38,24 +38,24 @@
       register: setup_out
     - debug:
         var: setup_out.stdout_lines
-    
+
     - name: Check Logical Volumes
       command: lvs
       register: lvs_out
     - debug:
         var: lvs_out.stdout_lines
-      
+
     - name: Check Docker Storage Configurations
       command: cat /etc/sysconfig/docker-storage
       register: cat_out
     - debug:
         var: cat_out.stdout_lines
-      
+
     - name: Enable Docker Service
       service:
         name: docker
         enabled: yes
-        
+
     - name: Start Docker Service
       service:
         name: docker

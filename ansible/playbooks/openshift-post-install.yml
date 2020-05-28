@@ -1,40 +1,39 @@
 ---
 
 - name: Openshift Post Installation
-  hosts: master.ocp.local.net
+  hosts: master.ocp3.local.net
   become: yes
-  
-  tasks: 
+
+  tasks:
     - name: Get Cluster Status
       command: oc status
       register: out
     - debug:
         var: out.stdout_lines
-        
+
     - name: List Nodes
       command: oc get nodes --show-labels
       register: out
     - debug:
         var: out.stdout_lines
-    
+
     - name: List Pods
       command: oc get pods -o wide
       register: out
     - debug:
         var: out.stdout_lines
-        
+
     - name: Annotate namespace default to use selector region=infra
-      command: oc annotate namespace default openshift.io/node-selector='function=registry-router' --overwrite
+      command: oc annotate namespace default openshift.io/node-selector='node-role.kubernetes.io/infra=true' --overwrite
 
     - name: Annotate registry console DC to use selector region=infra
-      command: oc patch dc registry-console -n default -p '{"spec":{"template":{"spec":{"nodeSelector":{"function":"registry-router"}}}}}'
-      
+      command: oc patch dc registry-console -n default -p '{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/infra":"true"}}}}}'
+
     - name: Add user admin
       command: useradd admin
 
     - name: Set admin password to admin
       command: htpasswd -cb /etc/origin/master/htpasswd admin admin
-     
+
     - name: Grant role admin to use admin on default namespace
       command: oc adm policy add-cluster-role-to-user cluster-admin admin
-        
