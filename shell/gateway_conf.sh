@@ -9,13 +9,15 @@ source /vagrant/shell/parent-shell.sh
 # Variables
 #
 gateway=""
+device=""
 
-TEMP=`getopt -o ab:c:: --long gateway: -- "$@"`
+TEMP=`getopt -o ab:c:: --long gateway:,device: -- "$@"`
 eval set -- "$TEMP"
 
 while true ; do
   case "$1" in
     --gateway ) gateway=$2;shift 2;;
+    --device ) device=$2;shift 2;;
     --)shift;break;;
   esac
 done
@@ -32,20 +34,15 @@ print_network_defaults() {
   ip addr show dev "$default_iface" | awk '$1 ~ /^inet/ { sub("/.*", "", $2); print $2 }'
 }
 
-delete_default_gateway() {
-  info "delete eth0 gateway"
-  eval `route -n | awk '{ if ($8 =="eth0" && $2 != "0.0.0.0") print "route del default gw " $2; }'`
-  # or simply "route del default"
-}
-
 set_default_gateway() {
   info "Set default gateway to $gateway"
-  route add default gw $gateway
+  echo "GATEWAY=$gateway" >> /etc/sysconfig/network
+  info "Set default device to $device"
+  echo "GATEWAYDEV=$device" >> /etc/sysconfig/network
+  systemctl restart network NetworkManager
 }
 
 main() {
-  print_network_defaults
-  delete_default_gateway
   print_network_defaults
   set_default_gateway
   print_network_defaults
