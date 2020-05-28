@@ -27,10 +27,10 @@ node2.ocp3.local.net
 toolbox.ocp3.local.net
 
 [nodes]
-master.ocp3.local.net   openshift_node_group_name="node-config-master"
-infra.ocp3.local.net    openshift_node_group_name="node-config-infra"
-node1.ocp3.local.net    openshift_node_group_name="node-config-compute"
-node2.ocp3.local.net    openshift_node_group_name="node-config-compute"
+master.ocp3.local.net   openshift_public_ip=192.168.2.205    openshift_node_group_name="node-config-master"
+infra.ocp3.local.net    openshift_public_ip=192.168.2.210    openshift_node_group_name="node-config-infra"
+node1.ocp3.local.net    openshift_public_ip=192.168.2.211    openshift_node_group_name="node-config-compute"
+node2.ocp3.local.net    openshift_public_ip=192.168.2.212    openshift_node_group_name="node-config-compute"
 
 [OSEv3:children]
 masters
@@ -72,6 +72,9 @@ os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 
 openshift_master_default_subdomain=apps.ocp3.local.net
 
+openshift_console_install=true
+openshift_console_hostname=console.apps.ocp3.local.net
+
 #openshift_use_dnsmasq=False
 #openshift_node_dnsmasq_additional_config_file=/home/bob/ose-dnsmasq.conf
 
@@ -95,15 +98,18 @@ osm_default_node_selector='node-role.kubernetes.io/compute=true'
 #
 #openshift_master_dynamic_provisioning_enabled=true
 
-
+##=============================================================================
 # Configure Router
-openshift_router_selector='node-role.kubernetes.io/infra=true'
+##=============================================================================
+openshift_hosted_router_selector='node-role.kubernetes.io/infra=true'
 openshift_hosted_router_replicas=1
 openshift_hosted_router_extended_validation=true
 #openshift_hosted_router_certificate={\"certfile\": \"/path/to/router.crt\", \"keyfile\": \"/path/to/router.key\", \"cafile\": \"/path/to/router-ca.crt\"}
 
+##=============================================================================
 # Configure Registry
-openshift_registry_selector='node-role.kubernetes.io/infra=true'
+##=============================================================================
+openshift_hosted_registry_selector='node-role.kubernetes.io/infra=true'
 openshift_hosted_registry_replicas=1
 
 openshift_enable_unsupported_configurations=true
@@ -115,62 +121,66 @@ openshift_hosted_registry_storage_nfs_directory=/exports
 openshift_hosted_registry_storage_volume_name=registry
 openshift_hosted_registry_storage_volume_size=10Gi
 
+##=============================================================================
 # Configure Logging
-#openshift_logging_install_logging=true
-#openshift_hosted_logging_elasticsearch_cluster_size=1
-#openshift_logging_es_cluster_size=1
+##=============================================================================
+openshift_logging_install_logging=false
+openshift_logging_es_cluster_size=1
+openshift_logging_es_nodeselector={"node-role.kubernetes.io/compute":"true"}
+openshift_logging_es_cpu_limit=2
+openshift_logging_es_memory_limit=4Gi
+
+openshift_logging_curator_default_days=2
+openshift_logging_curator_run_hour=0
+openshift_logging_curator_run_minute=0
+
+# Default storage class
+openshift_logging_es_pvc_dynamic=true
+#openshift_logging_es_pvc_storage_class_name=
+openshift_logging_es_pvc_size=10Gi
+
 #openshift_logging_storage_kind=nfs
 #openshift_logging_storage_access_modes=['ReadWriteOnce']
-#openshift_logging_storage_host=nfs.ocp3.local.net
+#openshift_logging_storage_host=toolbox.ocp3.local.net
 #openshift_logging_storage_nfs_directory=/exports
 #openshift_logging_storage_volume_name=logging
 #openshift_logging_storage_volume_size=10Gi
-#openshift_logging_es_nodeselector={'function': 'logging'}
-#openshift_logging_kibana_nodeselector={'function': 'logging'}
-#openshift_logging_curator_nodeselector={'function': 'logging'}
+#openshift_logging_storage_labels={'storage': 'logging'}
 
-# Configure Metrics
-#openshift_metrics_install_metrics=true
-#openshift_metrics_server_install=true
+##=============================================================================
+# Configure Metrics (Hawkular, Cassandra, Heapster)
+##=============================================================================
+openshift_metrics_install_metrics=false
+openshift_metrics_server_install=true
+# 2 days
+openshift_metrics_duration=2
+# Storage Options
+openshift_metrics_cassandra_storage_type=dynamic
+openshift_metrics_cassandra_pvc_size=10Gi
+
 #openshift_metrics_storage_kind=nfs
 #openshift_metrics_storage_access_modes=['ReadWriteOnce']
 #openshift_metrics_storage_host=toolbox.ocp3.local.net
 #openshift_metrics_storage_nfs_directory=/exports
 #openshift_metrics_storage_volume_name=metrics
-#openshift_metrics_storage_volume_size=15Gi
-#openshift_metrics_cassandra_nodeselector={'function': 'metrics'}
-#openshift_metrics_hawkular_nodeselector={'function': 'metrics'}
-#openshift_metrics_heapster_nodeselector={'function': 'metrics'}
+#openshift_metrics_storage_volume_size=10Gi
+#openshift_metrics_storage_labels={'storage': 'metrics'}
 
+##=============================================================================
+# Configure monitoring (Prometheus, Grafana)
+##=============================================================================
+openshift_cluster_monitoring_operator_install=false
+openshift_cluster_monitoring_operator_node_selector={"node-role.kubernetes.io/compute":"true"}
+openshift_cluster_monitoring_operator_prometheus_storage_capacity="10Gi"
+openshift_cluster_monitoring_operator_alertmanager_storage_capacity="2Gi"
 
-# Configure Prometheus and Grafana
-#openshift_hosted_prometheus_deploy=true
+# Use external storage
+openshift_cluster_monitoring_operator_prometheus_storage_enabled=true
+openshift_cluster_monitoring_operator_alertmanager_storage_enabled=true
 
-#openshift_prometheus_storage_kind=nfs
-#openshift_prometheus_alertmanager_storage_kind=nfs
-#openshift_prometheus_alertbuffer_storage_kind=nfs
+# Keep commented to use default storage class
+#openshift_cluster_monitoring_operator_prometheus_storage_class_name=""
+#openshift_cluster_monitoring_operator_alertmanager_storage_class_name=""
 
-#openshift_prometheus_storage_type=pvc
-#openshift_prometheus_alertmanager_storage_type=pvc
-#openshift_prometheus_alertbuffer_storage_type=pvc
-
-#openshift_prometheus_node_selector={'function': 'metrics'}
-
-#openshift_hosted_grafana_deploy=true
-#openshift_grafana_node_exporter=true
-#openshift_grafana_storage_type=pvc
-#openshift_grafana_sc_name=
-#openshift_grafana_node_selector={'function': 'metrics'}
-
-
-# Configure Management
-#openshift_management_install_management=true
-#openshift_management_app_template=miq-template
-#openshift_management_template_parameters={'APPLICATION_VOLUME_CAPACITY': '10Gi', 'DATABASE_VOLUME_CAPACITY': '25Gi'}
-#openshift_management_template_parameters={'APPLICATION_MEM_REQ': '3000Mi', 'POSTGRESQL_MEM_REQ': '1Gi', 'ANSIBLE_MEM_REQ': '512Mi'}
-#
-#openshift_management_storage_class=nfs
-#openshift_management_storage_nfs_local_hostname=nfs.ocp3.local.net
-#openshift_management_storage_nfs_base_dir=/exports
-#
-#openshift_management_nodeselector={'function': 'mgmt'}
+openshift_cluster_monitoring_operator_crd_retries=30
+openshift_cluster_monitoring_operator_crd_delay=30
