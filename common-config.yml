@@ -1,15 +1,26 @@
 ---
-   box: "centos/7"
    domain: "ocp3.local.net"
-   default.memory: 1024
+   default.group: "OCP 3"
+   default.box: "bento/centos-7"
+   default.box_version: "202005.21.0"
    default.cpus: 1
+   default.memory: 1024
+   # default.disk.size: "50GB"
+   default.disk.controller: "SATA Controller"
+   # default.disk.format: "vmdk"
    default.gateway: 192.168.2.1
+   default.interface:
+     - em4
 
 #   synced_folders:
 #      - src: keys
 #        dest: /keys
 #        options:
 #          :create: true
+
+   disks:
+     - name: var
+       size: 30
 
    provisions:
      - type: file
@@ -18,36 +29,47 @@
      - type: file
        src: shell
        dest: /vagrant/shell
-       
-#     - type: ansible
-#       playbook: playbook/basic_conf.yaml
-#       args:
+
+     # - type: ansible
+     #   playbook: playbook/basic_conf.yaml
+     #   args:
 
      - type: shell
        script: shell/update-packages.sh
        args:
-       
+
      - type: shell
        script: shell/install-packages.sh
-       args: --packages "wget git net-tools bind-utils yum-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct NetworkManager glusterfs-fuse"
-       
+       args: --packages "wget git net-tools bash-completion NetworkManager"
+
      - type: shell
        script: shell/network_conf.sh
        args: --dns "192.168.2.100"
-       
+
      - type: shell
-       script: shell/ntpd_conf.sh
-       args:
-       
+       script: shell/gateway_conf.sh
+       args: --gateway "192.168.2.1" --device "eth1"
+
      - type: shell
        script: shell/timezone_conf.sh
-       args: --timezone "Canada/Eastern"
-       
+       args: --timezone "America/Toronto"
+
+     # - type: shell
+     #   script: shell/ntpd_conf.sh
+     #   args:
+
+     - type: shell
+       script: shell/install-cockpit.sh
+       args: --port "8080"
+
      - type: shell
        script: shell/sshd_conf.sh
        args:
-       
+
      - type: shell
-       script: shell/network_fix.sh
-       args: 
-   
+       script: shell/create_disk_partition.sh
+       args: --disk "/dev/sdb" --label "msdos" --type "primary" --start "0" --end "100%" --fs "ext4"
+
+     - type: shell
+       script: shell/disk_mount.sh
+       args: --disk "/dev/sdb1" --dest "/var"
