@@ -7,7 +7,7 @@
    default.memory: 1024
    # default.disk.size: "50GB"
    default.disk.controller: "SATA Controller"
-   # default.disk.format: "vmdk"
+   # default.disk.format: "vdi"
    default.gateway: 192.168.2.1
    default.interface:
      - em4
